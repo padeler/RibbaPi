@@ -29,7 +29,7 @@ LEN_HOUR = 2
 class ClockAnimation(AbstractAnimation):
     def __init__(self, width, height, frame_queue, repeat=False,
                  mode='current', background_color=(50, 70, 230)):
-        super().__init__(width, height, frame_queue, repeat)
+        super(ClockAnimation, self).__init__(width, height, frame_queue, repeat)
         self.name = "clock"
         self.mode = mode
         self.background_color = background_color
