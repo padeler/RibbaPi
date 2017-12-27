@@ -28,11 +28,11 @@ class BlmAnimation(AbstractAnimation):
                  foregound_color=(255, 255, 255),
                  background_color=(10, 10, 10),
                  padding_color=(60, 60, 60)):
-        super().__init__(width, height, frame_queue, repeat)
+        super(BlmAnimation, self).__init__(width, height, frame_queue, repeat)
 
         self.path = Path(path)
         if not self.path.is_file():
-            raise FileNotFoundError
+            raise Exception("File not found")
         self.name = "blm.{}".format(self.path.stem)
 
         self.load_frames()
