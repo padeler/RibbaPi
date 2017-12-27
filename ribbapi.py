@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 
 # RibbaPi - APA102 LED matrix controlled by Raspberry Pi in python
 # Copyright (C) 2016  Christoph Stahl
@@ -49,6 +49,7 @@ DISPLAY_WIDTH = 16
 DISPLAY_HEIGTH = 16
 # HARDWARE = "APA102"
 HARDWARE = u"COMPUTER"
+HARDWARE = "SERIAL"
 
 
 class RibbaPi(object):
@@ -61,6 +62,9 @@ class RibbaPi(object):
         elif HARDWARE == u'COMPUTER':
             from display.computer import Computer
             self.display = Computer(DISPLAY_WIDTH, DISPLAY_HEIGTH)
+        elif HARDWARE == 'SERIAL':
+            from display.serial_display import SerialDisplay
+            self.display = SerialDisplay(DISPLAY_WIDTH, DISPLAY_HEIGTH)
         else:
             raise RuntimeError(
                 u"Display hardware \"{}\" not known.".format(HARDWARE))
@@ -79,17 +83,17 @@ class RibbaPi(object):
         self.gameframe_duration = 60
         self.gameframe_selected = []
 
-        self.blm_activated = False
+        self.blm_activated = True
         self.blm_repeat = -1
         self.blm_duration = 60
         self.blm_selected = []
 
-        self.clock_activated = True
+        self.clock_activated = False
         self.clock_last_shown = time.time()
         self.clock_show_every = 600
         self.clock_duration = 10
 
-        self.moodlight_activated = True 
+        self.moodlight_activated = False
 
         # find and prepare installed animations
         self.refresh_animations()
@@ -111,7 +115,7 @@ class RibbaPi(object):
         self.tpm2_net_server_thread.daemon = True
         self.tpm2_net_server_thread.start()
 
-        self.text_queue.put(u"RibbaPi")
+        self.text_queue.put("SOFI")
 
     # New frame handling
     def process_frame_queue(self):

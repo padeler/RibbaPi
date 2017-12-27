@@ -17,10 +17,22 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import absolute_import
+
+import urlparse
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import urllib
 import html
+import HTMLParser
 
+
+def unescape(input, encoding="iso-8859-1"):
+    parser = HTMLParser.HTMLParser()
+    # input = input.decode(encoding)
+    output = {}
+    for k,v in input.iteritems():
+        output[parser.unescape(k)] = parser.unescape(v)
+
+    return output
 
 class RibbaPiHttpServer(HTTPServer, object):
     def __init__(self, ribbapi):
@@ -114,7 +126,7 @@ class RibbaPiHttpHandler(BaseHTTPRequestHandler):
                 post_data = self.rfile.read(content_length)
                 post_data = unicode(post_data, u'utf-8')
                 post_data_dict = urlparse.parse_qs(post_data)
-                post_data_dict = html.unescape(post_data_dict)
+                post_data_dict = unescape(post_data_dict)
                 message = post_data_dict[u"message"][0]
                 self.server.ribbapi.text_queue.put(message)
                 self.send_response(303)
@@ -138,7 +150,7 @@ class RibbaPiHttpHandler(BaseHTTPRequestHandler):
                 post_data_dict = urlparse.parse_qs(post_data)
                 if u"animations" in post_data_dict:
                     selected_animations = post_data_dict[u"animations"]
-                    selected_animations = html.unescape(selected_animations)
+                    selected_animations = unescape(selected_animations)
                     self.server.ribbapi.gameframe_selected = selected_animations
                     self.send_response(200)
                     self.send_header(u'Content-type', u'text/html')
