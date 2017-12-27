@@ -19,15 +19,18 @@
 """
 This is the sceleton code for all animations.
 """
-
+from __future__ import absolute_import
 import abc
 import threading
 import time
 
 
-class AbstractAnimation(abc.ABC, threading.Thread):
+class AbstractAnimation(threading.Thread):
+    __metaclass__ = abc.ABCMeta 
+
     def __init__(self, width, height, frame_queue, repeat):
-        super().__init__(daemon=True)
+        super(AbstractAnimation, self).__init__()
+        self.daemon = True
         self.width = width  # width of frames to produce
         self.height = height  # height of frames to produce
         self.frame_queue = frame_queue  # queue to put frames onto

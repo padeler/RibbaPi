@@ -19,15 +19,16 @@
 # Protocol Reference
 # https://gist.github.com/jblang/89e24e2655be6c463c56
 
-import socketserver
+from __future__ import absolute_import
+import SocketServer
 import time
 from threading import Timer
 import numpy as np
 
 
-class Tpm2NetServer(socketserver.UDPServer):
+class Tpm2NetServer(SocketServer.UDPServer, object):
     def __init__(self, ribbapi):
-        super().__init__(('', 65506), Tpm2NetHandler, bind_and_activate=True)
+        super(Tpm2NetServer, self).__init__((u'', 65506), Tpm2NetHandler, bind_and_activate=True)
         self.ribbapi = ribbapi
         self.tmp_buffer = np.zeros((self.ribbapi.display.height,
                                     self.ribbapi.display.width,
@@ -64,7 +65,7 @@ class Tpm2NetServer(socketserver.UDPServer):
                 self.timeout_timer.start()
 
 
-class Tpm2NetHandler(socketserver.BaseRequestHandler):
+class Tpm2NetHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         data = self.request[0].strip()
         data_length = len(data)

@@ -28,7 +28,7 @@ from animation.abstract_animation import AbstractAnimation
 class MoodlightAnimation(AbstractAnimation):
     def __init__(self, width, height, frame_queue, repeat=False,
                  mode="wish_down_up"):
-        super().__init__(width, height, frame_queue, repeat)
+        super(MoodlightAnimation, self).__init__(width, height, frame_queue, repeat)
         self.mode = mode
         self.colors = [(255, 0, 0), (255, 255, 0), (0, 255, 255), (0, 0, 255)]  # if empty choose random colors
         self.random = False  # how to step through colors
@@ -56,9 +56,9 @@ class MoodlightAnimation(AbstractAnimation):
 
     def color_wheel_generator(self, steps):
         # steps: how many steps to take to go from 0 to 360.
-        increase = (360 - 0) / steps
+        increase = (360. - 0.) / float(steps)
         while True:
-            for i in np.arange(0, 360, increase):
+            for i in np.arange(0., 360., increase):
                 color = self.ribbapi_hsv_to_rgb(i, 100, 100)
                 yield color
 

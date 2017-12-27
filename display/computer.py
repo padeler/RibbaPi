@@ -25,7 +25,7 @@ from display.abstract_display import AbstractDisplay
 
 class Computer(AbstractDisplay):
     def __init__(self, width=16, height=16, margin=5, size=30):
-        super().__init__(width, height)
+        super(Computer, self).__init__(width, height)
 
         self.margin = margin
         self.size = size

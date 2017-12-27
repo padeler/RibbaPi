@@ -19,6 +19,8 @@
 # Notes
 # find . -name \*.pyc -delete
 
+from __future__ import division
+from __future__ import absolute_import
 from animation.gameframe import GameframeAnimation
 from animation.blm import BlmAnimation
 from animation.text import TextAnimation
@@ -29,7 +31,7 @@ from server.tpm2_net import Tpm2NetServer
 
 from pathlib import Path
 import os
-import queue
+import Queue
 import random
 import time
 import threading
@@ -45,31 +47,31 @@ import threading
 
 DISPLAY_WIDTH = 16
 DISPLAY_HEIGTH = 16
-HARDWARE = "APA102"
-#HARDWARE = "COMPUTER"
+# HARDWARE = "APA102"
+HARDWARE = u"COMPUTER"
 
 
-class RibbaPi():
+class RibbaPi(object):
     def __init__(self):
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-        if HARDWARE == 'APA102':
+        if HARDWARE == u'APA102':
             from display.apa102 import Apa102
             self.display = Apa102(DISPLAY_WIDTH, DISPLAY_HEIGTH)
-        elif HARDWARE == 'COMPUTER':
+        elif HARDWARE == u'COMPUTER':
             from display.computer import Computer
             self.display = Computer(DISPLAY_WIDTH, DISPLAY_HEIGTH)
         else:
             raise RuntimeError(
-                "Display hardware \"{}\" not known.".format(HARDWARE))
+                u"Display hardware \"{}\" not known.".format(HARDWARE))
 
         self.current_animation = None
 
         self.interrupted_animation_class = None
         self.interrupted_animation_kwargs = None
 
-        self.frame_queue = queue.Queue(maxsize=1)
-        self.text_queue = queue.Queue()
+        self.frame_queue = Queue.Queue(maxsize=1)
+        self.text_queue = Queue.Queue()
         self.receiving_data = threading.Event()
 
         self.gameframe_activated = True
@@ -87,7 +89,7 @@ class RibbaPi():
         self.clock_show_every = 600
         self.clock_duration = 10
 
-        self.moodlight_activated = False
+        self.moodlight_activated = True 
 
         # find and prepare installed animations
         self.refresh_animations()
@@ -98,18 +100,18 @@ class RibbaPi():
         # start http server
         self.http_server = RibbaPiHttpServer(self)
         self.http_server_thread = \
-            threading.Thread(target=self.http_server.serve_forever,
-                             daemon=True)
+            threading.Thread(target=self.http_server.serve_forever)
+        self.http_server_thread.daemon = True
         self.http_server_thread.start()
 
         # start tpm2_net server
         self.tpm2_net_server = Tpm2NetServer(self)
         self.tpm2_net_server_thread = \
-            threading.Thread(target=self.tpm2_net_server.serve_forever,
-                             daemon=True)
+            threading.Thread(target=self.tpm2_net_server.serve_forever)
+        self.tpm2_net_server_thread.daemon = True
         self.tpm2_net_server_thread.start()
 
-        self.text_queue.put("RibbaPi 👍")
+        self.text_queue.put(u"RibbaPi")
 
     # New frame handling
     def process_frame_queue(self):
@@ -149,20 +151,20 @@ class RibbaPi():
     def refresh_animations(self):
         # gameframe
         self.gameframe_animations = []
-        for p in sorted(Path("resources/animations/gameframe/").glob("*"), key=lambda s: s.name.lower()):
+        for p in sorted(Path(u"resources/animations/gameframe/").glob(u"*"), key=lambda s: s.name.lower()):
             if p.is_dir():
-                self.gameframe_animations.append(str(p))
-        for p in sorted(Path("resources/animations/gameframe_forum/").glob("*"), key=lambda s: s.name.lower()):
+                self.gameframe_animations.append(unicode(p))
+        for p in sorted(Path(u"resources/animations/gameframe_forum/").glob(u"*"), key=lambda s: s.name.lower()):
             if p.is_dir():
-                self.gameframe_animations.append(str(p))
-        self.gameframe_selected = self.gameframe_animations.copy()
+                self.gameframe_animations.append(unicode(p))
+        self.gameframe_selected = list(self.gameframe_animations)
 
         # blm
         self.blm_animations = []
-        for p in sorted(Path("resources/animations/162-blms/").glob("*.blm"), key=lambda s: s.name.lower()):
+        for p in sorted(Path(u"resources/animations/162-blms/").glob(u"*.blm"), key=lambda s: s.name.lower()):
             if p.is_file():
-                self.blm_animations.append(str(p))
-        self.blm_selected = self.blm_animations.copy()
+                self.blm_animations.append(unicode(p))
+        self.blm_selected = list(self.blm_animations)
 
     def clean_finished_animation(self):
         if self.current_animation and not self.current_animation.is_alive():
@@ -173,9 +175,9 @@ class RibbaPi():
         blms = self.blm_generator()
         while True:
             if self.gameframe_activated:
-                yield next(gameframes)
+                yield gameframes.next()
             if self.blm_activated:
-                yield next(blms)
+                yield blms.next()
             if not (self.gameframe_activated or self.blm_activated):
                 yield None
 
@@ -215,7 +217,7 @@ class RibbaPi():
 
     def set_next_animation(self, path):
         animation = None
-        if str(path).startswith("resources/animations/gameframe"):
+        if unicode(path).startswith(u"resources/animations/gameframe"):
             if Path(path).is_dir():
                 animation = GameframeAnimation(DISPLAY_WIDTH,
                                                DISPLAY_HEIGTH,
@@ -223,8 +225,8 @@ class RibbaPi():
                                                self.gameframe_repeat,
                                                path)
 
-        elif str(path).startswith("resources/animations/162-blms") and \
-                str(path).endswith("blm"):
+        elif unicode(path).startswith(u"resources/animations/162-blms") and \
+                unicode(path).endswith(u"blm"):
             if Path(path).is_file():
                 animation = BlmAnimation(DISPLAY_WIDTH,
                                          DISPLAY_HEIGTH,
@@ -259,7 +261,7 @@ class RibbaPi():
                                                DISPLAY_HEIGTH,
                                                self.frame_queue)
         else:
-            next_animation = next(self.animations)
+            next_animation = self.animations.next()
         return next_animation
 
     def is_current_animation_running(self):
@@ -325,7 +327,7 @@ class RibbaPi():
         self.http_server.server_close()
 
 
-if __name__ == "__main__":
+if __name__ == u"__main__":
     ribbapi = RibbaPi()
     ribbapi.display.show()
 

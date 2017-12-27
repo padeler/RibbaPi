@@ -16,16 +16,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""
+u"""
 This module is the abstract representation of a pixel matrix display.
 """
 
+from __future__ import division
+from __future__ import absolute_import
 import abc
 import numpy as np
 import time
 
 
-class AbstractDisplay(abc.ABC):
+class AbstractDisplay(object):
+    __metaclass__ = abc.ABCMeta
+
     def __init__(self, width=16, height=16):
         self.width = width
         self.height = height
@@ -36,7 +40,7 @@ class AbstractDisplay(abc.ABC):
 
     @property
     def buffer(self):
-        """The buffer contains the rgb data to be displayed."""
+        u"""The buffer contains the rgb data to be displayed."""
         return self._buffer
 
     @buffer.setter
@@ -52,11 +56,11 @@ class AbstractDisplay(abc.ABC):
 
     @abc.abstractmethod
     def show(self, gamma=False):
-        """Display the contents of buffer on display. Gamma correction can be
+        u"""Display the contents of buffer on display. Gamma correction can be
         toggled."""
 
     def set_brightness(self, brightness):
-        """Set the brightness (float) 0.0 to 1.0 value"""
+        u"""Set the brightness (float) 0.0 to 1.0 value"""
         if brightness > 1.0:
             self.brightness = 1.0
         elif brightness < 0.0:
@@ -65,7 +69,7 @@ class AbstractDisplay(abc.ABC):
             self.brightness = brightness
 
     def set_pixel_at_index(self, index, color):
-        """Set pixel at logical position index (from top left counted row-wise)
+        u"""Set pixel at logical position index (from top left counted row-wise)
         to color, which must be a rgb values tuple"""
         if (index < 0) or (index >= self.num_pixels):
             return
@@ -73,7 +77,7 @@ class AbstractDisplay(abc.ABC):
         self._buffer.put([index, index+1, index+2], color)
 
     def set_pixel_at_coord(self, x, y, color):
-        """Set pixel at coordinate x,y to color, which must be a rgb values
+        u"""Set pixel at coordinate x,y to color, which must be a rgb values
         tuple"""
         if (x < 0) or (x >= self.width) or (y < 0) or (y >= self.height):
             return
@@ -105,7 +109,7 @@ class AbstractDisplay(abc.ABC):
     def run_benchmark(self, gamma=False):
         total = 0
         repeat = self.num_pixels * 10
-        for i in range(repeat):
+        for i in xrange(repeat):
             start = time.time()
             self.set_pixel_at_index(i % self.num_pixels, (255, 255, 255))
             self.show(gamma)
@@ -113,7 +117,6 @@ class AbstractDisplay(abc.ABC):
             end = time.time()
             diff = end - start
             total = total + diff
-        print("{:.2f}s for {} iterations. {:d} refreshs per second"
-              "".format(total, repeat, int(repeat/total)))
+        print u"{:.2f}s for {} iterations. {:d} refreshs per second ".format(total, repeat, int(repeat/total))
         self.clear_buffer()
         self.show()

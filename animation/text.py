@@ -32,8 +32,8 @@ class TextAnimation(AbstractAnimation):
                  steps_per_second=15, pixels_per_step=1, text_size=16,
                  emoji_size=20,
                  text_font="resources/fonts/SFCompactDisplay-Regular.otf",
-                 emoji_font="resources/fonts/Apple Color Emoji.ttc"):
-        super().__init__(width, height, frame_queue, repeat)
+                 emoji_font="resources/fonts/EmojiOneColor-SVGinOT.ttf"):
+        super(TextAnimation, self).__init__(width, height, frame_queue, repeat)
 
         self.name = "text"
         self.text = text
