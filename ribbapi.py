@@ -115,7 +115,7 @@ class RibbaPi(object):
         self.tpm2_net_server_thread.daemon = True
         self.tpm2_net_server_thread.start()
 
-        self.text_queue.put("SOFI")
+        # self.text_queue.put("SOFI")
 
     # New frame handling
     def process_frame_queue(self):
@@ -158,7 +158,7 @@ class RibbaPi(object):
         for p in sorted(Path(u"resources/animations/gameframe/").glob(u"*"), key=lambda s: s.name.lower()):
             if p.is_dir():
                 self.gameframe_animations.append(unicode(p))
-        for p in sorted(Path(u"resources/animations/gameframe_forum/").glob(u"*"), key=lambda s: s.name.lower()):
+        for p in sorted(Path(u"resources/animations/art/").glob(u"*"), key=lambda s: s.name.lower()):
             if p.is_dir():
                 self.gameframe_animations.append(unicode(p))
         self.gameframe_selected = list(self.gameframe_animations)

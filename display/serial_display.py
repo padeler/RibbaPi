@@ -17,6 +17,7 @@ class SerialDisplay(AbstractDisplay):
     def show(self, gamma=False):
 
         buf = self.buffer.flatten().tolist()
+        self.ser.write([10,16]) # packet header. Image with 16 parts
         self.ser.write(buf)
         time.sleep(0.1)
 

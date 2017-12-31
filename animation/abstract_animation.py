@@ -37,6 +37,7 @@ class AbstractAnimation(threading.Thread):
         self.repeat = repeat  # 0: no repeat, -1: forever, > 0: x-times
 
         self._running = False  # query this often! exit self.animate quickly
+        self.started = False
 
     def run(self):
         """This is the run method from threading.Thread"""

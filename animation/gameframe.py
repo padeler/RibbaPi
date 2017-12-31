@@ -30,10 +30,10 @@ from animation.abstract_animation import AbstractAnimation
 
 class GameframeAnimation(AbstractAnimation):
     def __init__(self, width, height, frame_queue, repeat, folder):
-        super().__init__(width, height, frame_queue, repeat)
+        super(GameframeAnimation, self).__init__(width, height, frame_queue, repeat)
         self.folder = Path(folder)
         if not self.folder.is_dir():
-            raise NotADirectoryError
+            raise Exception("Not a directory %s"%folder)
         self.name = "gameframe.{}".format(self.folder.name)
 
         self.load_frames()
@@ -73,7 +73,7 @@ class GameframeAnimation(AbstractAnimation):
                 self.frames.append(np.array(image))
             image = None
         if len(self.frames) == 0:
-            raise AttributeError
+            raise AttributeError("No frames in path %s"%self.folder)
 
     def read_config(self):
         self.hold = 100
